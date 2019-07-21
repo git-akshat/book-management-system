@@ -48,7 +48,7 @@ public class Book {
 
 	@Override
 	public String toString() {
-		return "Book [isbn=" + isbn + ", title=" + title + ", Category=" + Category + ", quantity=" + quantity + "]";
+		return "" + isbn + "\t\t" + title + "\t\t" + Category + "\t\t" + quantity;
 	}
 	
 }

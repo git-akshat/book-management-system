@@ -10,8 +10,7 @@ public class BookIssue {
 	private Date return_date;
 	public String book_isbn;
 	
-	public BookIssue(int id, String usn, Date issue_date, Date return_date, String book_isbn) {
-		this.id = id;
+	public BookIssue(String usn, Date issue_date, Date return_date, String book_isbn) {
 		this.usn = usn;
 		this.issue_date = issue_date;
 		this.return_date = return_date;
@@ -20,10 +19,6 @@ public class BookIssue {
 
 	public int getId() {
 		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
 	}
 
 	public String getUsn() {
@@ -60,8 +55,7 @@ public class BookIssue {
 
 	@Override
 	public String toString() {
-		return "BookIssue [id=" + id + ", usn=" + usn + ", issue_date=" + issue_date + ", return_date=" + return_date
-				+ ", book_isbn=" + book_isbn + "]";
+		return "" + id + "\t" + usn + "\t" + issue_date + "\t" + return_date + "\t" + book_isbn;
 	}
 		
 

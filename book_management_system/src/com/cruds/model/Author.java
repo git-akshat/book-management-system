@@ -38,7 +38,7 @@ public class Author {
 
 	@Override
 	public String toString() {
-		return "Author [name=" + name + ", email=" + email + ", book_isbn=" + book_isbn + "]";
+		return "" + name + "\t" + email + "\t" + book_isbn;
 	}
 	
 	

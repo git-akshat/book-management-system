@@ -9,7 +9,7 @@ public class DBConnectionManager {
 	static
 	{
 		try {
-			Class.forName("com.mysl.jdbc.driver");
+			Class.forName("com.mysql.jdbc.Driver");
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -21,7 +21,7 @@ public class DBConnectionManager {
 		
 		Connection conn = null;
 		try {
-			conn = DriverManager.getConnection("jdbc:mysql//localhost:3306/bookdb", "root", "root");
+			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/bookdb", "root", "root");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
