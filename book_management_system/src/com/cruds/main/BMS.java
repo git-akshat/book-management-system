@@ -1,11 +1,16 @@
 package com.cruds.main;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 
 import com.cruds.db.BookDAO;
 import com.cruds.model.Book;
+import com.cruds.model.BookIssue;
 
 public class BMS {
 
@@ -15,11 +20,12 @@ public class BMS {
 		
 		int choice;
 		int id, numBooks;
-		String isbn, usn, title, category, name, email;
+		String isbn, usn, title, category, name, email, issue_date, return_date;
 		
 		Book book;
 		List<Book> blist = new ArrayList<Book>();
 		BookDAO dao = new BookDAO();
+		Date idate = null, rdate = null;
 
 		while(true) {
 			System.out.println("1.Add a book");
@@ -128,23 +134,44 @@ public class BMS {
 					usn = sc.next();
 
 					System.out.print("Enter issue date : ");
-					String d = sc.next();
+					issue_date = sc.next();
+					try {
+						idate = new SimpleDateFormat("dd/MM/yyyy").parse(issue_date);
+					} catch (ParseException e) {
+						e.printStackTrace();
+					}
 
-					System.out.print("Enter name : ");
-					name = sc.next();
+					System.out.print("Enter return date : ");
+					return_date = sc.next();
+					try {
+						rdate = new SimpleDateFormat("dd/MM/yyyy").parse(issue_date);
+					} catch (ParseException e) {
+						e.printStackTrace();
+					}
 
-					System.out.print("Enter name : ");
-					name = sc.next();
+					System.out.print("Enter book ISBN : ");
+					isbn = sc.next();
 					
-					System.out.print("Enter name : ");
-					name = sc.next();
-					
-					System.out.print("Enter name : ");
-					name = sc.next();
+					dao.issueBook(new BookIssue(usn, idate, rdate, isbn));
 					
 					break;
 			
-			case 7: System.exit(0);
+			case 7: System.out.print("Enter usn : ");
+					usn = sc.next();
+			
+					if(!dao.listBookByUsn(usn))
+					{
+						System.out.println("No record found.");
+					}
+					break;
+					
+			case 8:	if(!dao.getBookToReturn())
+					{
+						System.out.println("There is no book to be returned today");
+					}
+					break;
+					
+			case 9: System.exit(0);
 			}
 			
 		}
