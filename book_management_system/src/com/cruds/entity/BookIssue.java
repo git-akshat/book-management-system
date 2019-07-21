@@ -1,4 +1,4 @@
-package com.cruds.bms;
+package com.cruds.entity;
 
 import java.util.Date;
 
