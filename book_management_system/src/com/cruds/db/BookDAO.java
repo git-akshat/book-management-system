@@ -1,11 +1,11 @@
-package com.cruds.database;
+package com.cruds.db;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import com.cruds.entity.Book;
+import com.cruds.model.Book;
 
 public class BookDAO {
 	
@@ -76,5 +76,7 @@ public class BookDAO {
 		
 		return b;
 	}
+	
+	
 
 }

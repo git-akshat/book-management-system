@@ -1,4 +1,4 @@
-package com.cruds.entity;
+package com.cruds.model;
 
 public class Author {
 	
