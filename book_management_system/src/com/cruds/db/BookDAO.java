@@ -14,7 +14,8 @@ import java.util.List;
 
 import com.cruds.model.Author;
 import com.cruds.model.Book;
-import com.cruds.model.BookIssue;
+import com.cruds.model.Issue;
+import com.cruds.model.Student;
 
 public class BookDAO {
 	
@@ -38,6 +39,69 @@ public class BookDAO {
 		}
 		
 		return rows > 0;
+	}
+	
+	public boolean addAuthor(Author author)
+	{
+		String sql = "insert into author(author_name, author_mail_id, book_isbn) values(?, ?, ?)";
+		int rows = 0;
+		
+		try(Connection conn = DBConnectionManager.getConnection())
+		{
+			PreparedStatement ps = conn.prepareStatement(sql);
+			ps.setString(1, author.getName());
+			ps.setString(2,  author.getEmail());
+			ps.setString(3, author.getBook_isbn());
+			
+			rows = ps.executeUpdate();
+		}
+		catch(SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return rows > 0;
+	}
+	
+	public boolean addStudent(Student stud)
+	{
+		String sql = "insert into student(usn, name) values(?, ?)";
+		int rows = 0;
+		
+		try(Connection conn = DBConnectionManager.getConnection())
+		{
+			PreparedStatement ps = conn.prepareStatement(sql);
+			ps.setString(1, stud.getUsn());
+			ps.setString(2,  stud.getName());
+			
+			rows = ps.executeUpdate();
+		}
+		catch(SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return rows >= 0;
+	}
+	
+	public boolean studentExist(Student stud)
+	{
+		String sql = "select usn, name from student where usn = ?";
+		boolean flag = false;;
+		
+		try(Connection conn = DBConnectionManager.getConnection())
+		{
+			PreparedStatement ps = conn.prepareStatement(sql);
+			ps.setString(1, stud.getUsn());			
+			ResultSet rs = ps.executeQuery();
+			if(rs != null && rs.next())
+			{
+				flag = true;
+			}
+		}
+		catch(SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return flag;
 	}
 	
 	public List<Book> getByTitle(String title)
@@ -118,8 +182,6 @@ public class BookDAO {
 	public boolean getBookAuthor()
 	{
 		String sql = "select b.book_isbn, b.book_title, b.category, b.no_of_books, a.author_name, a.author_mail_id from book b left join author a on b.book_isbn = a.book_isbn";
-		Book b = null;
-		Author a = null;
 		boolean flag = false;
 		
 		try(Connection conn = DBConnectionManager.getConnection())
@@ -129,11 +191,11 @@ public class BookDAO {
 			if(rs != null)
 			{
 				flag = true;
-				System.out.println("ISBN\tTitle\tCategory\tNo of books\tAuthor name\tAuthor mail id");
+				System.out.printf("%10s \t %15s \t %10s \t %15s \t %15s \t %20s","ISBN", "Title", "Category", "No of books", "Author name", "Author mail id");
 			}
 			while(rs != null && rs.next())
 			{
-				System.out.println(rs.getString(1) + "\t" + rs.getString(2) + "\t" + rs.getString(3) + "\t" + rs.getInt(4) + "\t" + rs.getString(5) + "\t" + rs.getString(6));
+				System.out.printf("\n%10s \t %15s \t %10s \t %15d \t %15s \t %20s", rs.getString(1), rs.getString(2), rs.getString(3), rs.getInt(4), rs.getString(5), rs.getString(6));
 			}
 			
 		} catch (SQLException e) {
@@ -143,18 +205,20 @@ public class BookDAO {
 		return flag;
 	}
 	
-	public boolean issueBook(BookIssue bi)
+	public boolean issueBook(Issue bi)
 	{
 		String sql = "insert into book_issue(issue_id, usn, issue_date, return_date, book_isbn) values(?, ?, ?, ?, ?)";
 		int rows = 0;
+		java.sql.Date idate = new java.sql.Date(bi.getIssueDate().getTime());
+		java.sql.Date rdate = new java.sql.Date(bi.getReturnDate().getTime());
 		
 		try(Connection conn = DBConnectionManager.getConnection())
 		{
 			PreparedStatement ps = conn.prepareStatement(sql);
 			ps.setInt(1, bi.getId());
 			ps.setString(2, bi.getUsn());
-			ps.setDate(3, (java.sql.Date)bi.getIssue_date());
-			ps.setDate(4, (java.sql.Date)bi.getReturn_date());
+			ps.setDate(3, idate);
+			ps.setDate(4, rdate);
 			ps.setString(5, bi.getBook_isbn());
 			
 			rows = ps.executeUpdate();
@@ -181,12 +245,12 @@ public class BookDAO {
 			if(rs != null)
 			{
 				flag = true;
-				System.out.println("Book Title\tStudent Name\tReturn Date");
+				System.out.printf("%20s \t %15s \t %10s", "Book Title", "Student Name", "Return Date");
 			}
 			
 			while(rs != null && rs.next())
 			{
-				System.out.println(rs.getString(1) + "\t" + rs.getString(2) + "\t" + (java.util.Date)rs.getDate(3));
+				System.out.printf("\n%20s \t %15s \t %10s", rs.getString(1), rs.getString(2), (java.util.Date)rs.getDate(3));
 			}
 			
 		} catch (SQLException e) {
@@ -196,34 +260,21 @@ public class BookDAO {
 		return flag;
 	}
 	
-	public boolean getBookToReturn()
+	public boolean getBookToReturn(Date curDate)
 	{
 		String sql = "select b.book_isbn, b.book_title, b.category from book b, book_issue bi where bi.book_isbn = b.book_isbn and return_date = ?";
 		int rows = 0;
-		
-
-		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");  
-		LocalDateTime now = LocalDateTime.now();  
-	    Date d = null;
-		try {
-			d = new SimpleDateFormat("dd/MM/yyyy").parse(dtf.format(now));
-		} catch (ParseException e1) {
-			e1.printStackTrace();
-		}  
+		java.sql.Date cDate = new java.sql.Date(curDate.getTime());
 		
 		try(Connection conn = DBConnectionManager.getConnection())
 		{
 			PreparedStatement ps = conn.prepareStatement(sql);
-			ps.setDate(1, (java.sql.Date)d);
+			ps.setDate(1, cDate);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 		
 		return rows > 0;
 	}
-	
-	
-	
-	
 
 }

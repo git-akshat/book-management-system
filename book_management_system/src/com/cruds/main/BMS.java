@@ -1,16 +1,16 @@
 package com.cruds.main;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 
 import com.cruds.db.BookDAO;
+import com.cruds.model.Author;
 import com.cruds.model.Book;
-import com.cruds.model.BookIssue;
+import com.cruds.model.Issue;
+import com.cruds.model.Student;
 
 public class BMS {
 
@@ -19,15 +19,19 @@ public class BMS {
 		Scanner sc = new Scanner(System.in);
 		
 		int choice;
-		int id, numBooks;
-		String isbn, usn, title, category, name, email, issue_date, return_date;
+		int numBooks;
+		String isbn, usn, title, category, name, email;
 		
-		Book book;
 		List<Book> blist = new ArrayList<Book>();
 		BookDAO dao = new BookDAO();
-		Date idate = null, rdate = null;
+		
+		Calendar cal = Calendar.getInstance();
+		Date curDate = cal.getTime();
+		
+		
 
 		while(true) {
+			System.out.println("---- SIT LIBRARY ----");
 			System.out.println("1.Add a book");
 			System.out.println("2.Search book by title");
 			System.out.println("3.Search book by category");
@@ -51,11 +55,17 @@ public class BMS {
 					System.out.print("Enter category : ");
 					category = sc.next();
 					
+					System.out.print("Enter Author name : ");
+					name = sc.next();
+					
+					System.out.print("Enter Author mail id : ");
+					email = sc.next();
+					
 					System.out.print("Enter number of books : ");
 					numBooks = sc.nextInt();
 
 				
-					if( dao.addBook(new Book(isbn, title, category, numBooks)) )
+					if( dao.addBook(new Book(isbn, title, category, numBooks)) && dao.addAuthor(new Author(name, email, isbn)) )
 					{
 						System.out.println("Book details added successfully");
 					}
@@ -132,27 +142,30 @@ public class BMS {
 					
 			case 6: System.out.print("Enter usn : ");
 					usn = sc.next();
-
-					System.out.print("Enter issue date : ");
-					issue_date = sc.next();
-					try {
-						idate = new SimpleDateFormat("dd/MM/yyyy").parse(issue_date);
-					} catch (ParseException e) {
-						e.printStackTrace();
-					}
-
-					System.out.print("Enter return date : ");
-					return_date = sc.next();
-					try {
-						rdate = new SimpleDateFormat("dd/MM/yyyy").parse(issue_date);
-					} catch (ParseException e) {
-						e.printStackTrace();
-					}
-
-					System.out.print("Enter book ISBN : ");
-					isbn = sc.next();
 					
-					dao.issueBook(new BookIssue(usn, idate, rdate, isbn));
+					System.out.print("Enter name : ");
+					name = sc.next();
+										
+					System.out.print("Enter book ISBN : ");
+					isbn = sc.next();	
+
+					Date issue_date = curDate;
+					
+					cal.add(Calendar.DATE, 7); //add 7 days to current date
+					Date return_date = cal.getTime();
+					
+					//java.sql.Date idate = new java.sql.Date(issue_date.getTime());
+					//java.sql.Date rdate = new java.sql.Date(return_date.getTime());
+					
+					
+					if( (dao.studentExist(new Student(usn, name)) || dao.addStudent(new Student(usn, name))) && dao.issueBook(new Issue(usn, issue_date, return_date, isbn)) )
+					{
+						System.out.println("Book issued. Return date : " + return_date);
+					}
+					else
+					{
+						System.out.println("Can't issue.");
+					}
 					
 					break;
 			
@@ -165,14 +178,17 @@ public class BMS {
 					}
 					break;
 					
-			case 8:	if(!dao.getBookToReturn())
+			case 8:	if(!dao.getBookToReturn(curDate))
 					{
 						System.out.println("There is no book to be returned today");
 					}
 					break;
 					
+					
 			case 9: System.exit(0);
 			}
+			
+			System.out.println("\n");
 			
 		}
 	

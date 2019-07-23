@@ -2,15 +2,15 @@ package com.cruds.model;
 
 import java.util.Date;
 
-public class BookIssue {
+public class Issue {
 	
 	private int id;
 	public String usn;
-	private Date issue_date;
-	private Date return_date;
+	public Date issue_date;
+	public Date return_date;
 	public String book_isbn;
 	
-	public BookIssue(String usn, Date issue_date, Date return_date, String book_isbn) {
+	public Issue(String usn, Date issue_date, Date return_date, String book_isbn) {
 		this.usn = usn;
 		this.issue_date = issue_date;
 		this.return_date = return_date;
@@ -29,19 +29,19 @@ public class BookIssue {
 		this.usn = usn;
 	}
 
-	public Date getIssue_date() {
+	public Date getIssueDate() {
 		return issue_date;
 	}
 
-	public void setIssue_date(Date issue_date) {
+	public void setIssueDate(Date issue_date) {
 		this.issue_date = issue_date;
 	}
 
-	public Date getReturn_date() {
+	public Date getReturnDate() {
 		return return_date;
 	}
-
-	public void setReturn_date(Date return_date) {
+	
+	public void setReturnDate(Date return_date) {
 		this.return_date = return_date;
 	}
 

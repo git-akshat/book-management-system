@@ -2,8 +2,8 @@ package com.cruds.model;
 
 public class Student {
 	
-	private String usn;
-	private String name;
+	public String usn;
+	public String name;
 	
 	public Student(String usn, String name) {
 		this.usn = usn;
